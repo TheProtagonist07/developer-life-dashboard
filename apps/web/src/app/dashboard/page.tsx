@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import { Navbar } from "../../components/layout/Navbar";
+import { MobileNav } from "../../components/layout/MobileNav";
 import { StatsRow } from "../../components/dashboard/StatsRow";
 import { ActivityHeatmap } from "../../components/heatmap/ActivityHeatmap";
 import { StreakGrid } from "../../components/dashboard/StreakGrid";
@@ -14,20 +15,45 @@ import { LogActivityModal } from "../../components/dashboard/LogActivityModal";
 import { PlatformsPanel } from "../../components/dashboard/PlatformsPanel";
 import { AchievementsPanel } from "../../components/dashboard/AchievementsPanel";
 import { ReportsPanel } from "../../components/reports/ReportsPanel";
+import { InstallPrompt } from "../../components/pwa/InstallPrompt";
 
 type Tab = "overview" | "reports" | "analytics" | "platforms" | "achievements";
 
-export default function DashboardPage() {
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: "overview", label: "Overview" },
+  { id: "reports", label: "Reports" },
+  { id: "analytics", label: "Analytics" },
+  { id: "platforms", label: "Platforms" },
+  { id: "achievements", label: "Achievements" },
+];
+
+function DashboardContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("overview");
+  const searchParams = useSearchParams();
   const [showLogModal, setShowLogModal] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear());
 
+  const tab = (searchParams.get("tab") as Tab) ?? "overview";
+
+  const setTab = (next: Tab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+  };
+
+  // Manifest shortcut: /dashboard?action=log opens the log modal directly.
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/");
+    if (searchParams.get("action") === "log") {
+      setShowLogModal(true);
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("action");
+      router.replace(`/dashboard?${params.toString()}`, { scroll: false });
     }
+  }, [searchParams, router]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) router.replace("/");
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
@@ -40,27 +66,20 @@ export default function DashboardPage() {
 
   if (!isAuthenticated) return null;
 
-  const tabs: Array<{ id: Tab; label: string }> = [
-    { id: "overview", label: "Overview" },
-    { id: "reports", label: "Reports" },
-    { id: "analytics", label: "Analytics" },
-    { id: "platforms", label: "Platforms" },
-    { id: "achievements", label: "Achievements" },
-  ];
-
   return (
     <>
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-24 sm:pb-6">
         {/* Tabs + actions */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex gap-1">
-            {tabs.map((t) => (
+          {/* Desktop tabs — horizontally scrollable, hidden on mobile (bottom nav instead) */}
+          <div className="hidden sm:flex gap-1 overflow-x-auto">
+            {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   tab === t.id
                     ? "bg-white/10 text-white"
                     : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
@@ -71,9 +90,14 @@ export default function DashboardPage() {
             ))}
           </div>
 
+          {/* Mobile: current tab title */}
+          <h1 className="sm:hidden text-lg font-semibold text-white capitalize">
+            {TABS.find((t) => t.id === tab)?.label ?? "Overview"}
+          </h1>
+
           <button
             onClick={() => setShowLogModal(true)}
-            className="flex items-center gap-1.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg transition-colors"
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg transition-colors"
           >
             <span className="text-lg leading-none">+</span>
             Log Activity
@@ -84,7 +108,6 @@ export default function DashboardPage() {
           <>
             <StatsRow />
 
-            {/* Heatmap with year selector */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 justify-end">
                 {[year - 1, year].map((y) => (
@@ -117,7 +140,24 @@ export default function DashboardPage() {
         {tab === "achievements" && <AchievementsPanel />}
       </main>
 
+      <MobileNav onLogActivity={() => setShowLogModal(true)} />
+      <InstallPrompt />
+
       {showLogModal && <LogActivityModal onClose={() => setShowLogModal(false)} />}
     </>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }
