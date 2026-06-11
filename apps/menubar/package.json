@@ -1,0 +1,34 @@
+{
+  "name": "@devlife/menubar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Developer Life Dashboard — macOS menu bar app",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && electron .",
+    "start": "electron .",
+    "typecheck": "tsc --noEmit",
+    "dist": "tsc && electron-builder --mac",
+    "icons": "python3 scripts/generate-tray-icons.py"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "electron": "^31.1.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.2"
+  },
+  "build": {
+    "appId": "dev.devlife.menubar",
+    "productName": "Dev Life",
+    "files": ["dist/**/*", "renderer/**/*", "assets/**/*"],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": "dmg",
+      "icon": "assets/icon.png"
+    }
+  }
+}
