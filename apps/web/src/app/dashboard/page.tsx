@@ -13,8 +13,9 @@ import { AnalyticsPanel } from "../../components/dashboard/AnalyticsPanel";
 import { LogActivityModal } from "../../components/dashboard/LogActivityModal";
 import { PlatformsPanel } from "../../components/dashboard/PlatformsPanel";
 import { AchievementsPanel } from "../../components/dashboard/AchievementsPanel";
+import { ReportsPanel } from "../../components/reports/ReportsPanel";
 
-type Tab = "overview" | "analytics" | "platforms" | "achievements";
+type Tab = "overview" | "reports" | "analytics" | "platforms" | "achievements";
 
 export default function DashboardPage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -41,6 +42,7 @@ export default function DashboardPage() {
 
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: "overview", label: "Overview" },
+    { id: "reports", label: "Reports" },
     { id: "analytics", label: "Analytics" },
     { id: "platforms", label: "Platforms" },
     { id: "achievements", label: "Achievements" },
@@ -109,6 +111,7 @@ export default function DashboardPage() {
           </>
         )}
 
+        {tab === "reports" && <ReportsPanel />}
         {tab === "analytics" && <AnalyticsPanel />}
         {tab === "platforms" && <PlatformsPanel />}
         {tab === "achievements" && <AchievementsPanel />}

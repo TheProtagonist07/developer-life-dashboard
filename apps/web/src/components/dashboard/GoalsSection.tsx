@@ -3,6 +3,7 @@
 import { useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { api } from "../../lib/api";
+import { celebrate } from "../../lib/celebrate";
 import type { Goal } from "../../types";
 
 function GoalCard({ goal, onUpdate }: { goal: Goal; onUpdate: () => void }) {
@@ -47,7 +48,13 @@ function GoalCard({ goal, onUpdate }: { goal: Goal; onUpdate: () => void }) {
           onClick={async () => {
             const val = prompt("Update current value:", String(goal.current_value));
             if (val === null) return;
-            await api.goals.update(goal.id, { currentValue: parseFloat(val) } as Parameters<typeof api.goals.update>[1]);
+            const newValue = parseFloat(val);
+            const justCompleted = newValue >= goal.target_value && goal.current_value < goal.target_value;
+            await api.goals.update(goal.id, {
+              currentValue: newValue,
+              ...(justCompleted ? { status: "completed" } : {}),
+            } as Parameters<typeof api.goals.update>[1]);
+            if (justCompleted) celebrate();
             onUpdate();
           }}
           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
