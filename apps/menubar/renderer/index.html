@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>Dev Life</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="brand-mark">🧑‍💻</span>
+        <span class="brand-name">Dev Life</span>
+      </div>
+      <div class="header-actions">
+        <button id="refresh-btn" class="icon-btn" title="Refresh" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+        <button id="settings-btn" class="icon-btn" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main status view -->
+    <main id="status-view" class="view">
+      <!-- Hero streak -->
+      <section class="hero">
+        <div class="hero-flame">🔥</div>
+        <div class="hero-value" id="overall-streak">—</div>
+        <div class="hero-label">day overall streak</div>
+      </section>
+
+      <!-- Today + Week -->
+      <section class="stat-grid">
+        <div class="stat">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-value" id="today-count">—</div>
+          <div class="stat-label">today</div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="week-days">—</div>
+          <div class="stat-label">active this week</div>
+        </div>
+      </section>
+
+      <!-- Sub-streaks -->
+      <section class="substreaks">
+        <div class="substreak">
+          <span class="substreak-icon">⑂</span>
+          <span class="substreak-value" id="coding-streak">—</span>
+          <span class="substreak-label">Coding</span>
+        </div>
+        <div class="substreak">
+          <span class="substreak-icon">🧩</span>
+          <span class="substreak-value" id="dsa-streak">—</span>
+          <span class="substreak-label">DSA</span>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="status-footer">
+        <span id="sync-status" class="sync-status">—</span>
+        <button id="open-dashboard" class="link-btn">Open dashboard →</button>
+      </footer>
+    </main>
+
+    <!-- Empty / error state -->
+    <main id="empty-view" class="view hidden">
+      <div class="empty">
+        <div class="empty-icon">🔌</div>
+        <div class="empty-title" id="empty-title">Not connected</div>
+        <div class="empty-text" id="empty-text">Add your API details to get started.</div>
+        <button id="empty-settings-btn" class="primary-btn">Open settings</button>
+      </div>
+    </main>
+
+    <!-- Settings view -->
+    <main id="settings-view" class="view hidden">
+      <div class="settings">
+        <label class="field">
+          <span class="field-label">API URL</span>
+          <input id="set-apiUrl" type="text" placeholder="http://localhost:3001" spellcheck="false" />
+        </label>
+        <label class="field">
+          <span class="field-label">API key</span>
+          <input id="set-apiKey" type="password" placeholder="HA_API_KEY from your .env" spellcheck="false" />
+        </label>
+        <label class="field">
+          <span class="field-label">User ID</span>
+          <input id="set-userId" type="text" placeholder="From dashboard → Settings" spellcheck="false" />
+        </label>
+
+        <div class="field-row">
+          <label class="checkbox">
+            <input id="set-notifyOnStreak" type="checkbox" />
+            <span>Streak notifications</span>
+          </label>
+          <label class="checkbox">
+            <input id="set-remindIfIdle" type="checkbox" />
+            <span>Idle-day reminder</span>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Refresh interval (seconds)</span>
+          <input id="set-pollIntervalSec" type="number" min="60" step="30" />
+        </label>
+
+        <div id="test-result" class="test-result hidden"></div>
+
+        <div class="settings-actions">
+          <button id="test-btn" class="ghost-btn">Test connection</button>
+          <button id="save-btn" class="primary-btn">Save</button>
+        </div>
+
+        <button id="quit-btn" class="quit-btn">Quit Dev Life</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
