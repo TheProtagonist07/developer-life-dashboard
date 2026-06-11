@@ -78,6 +78,12 @@ export function Navbar() {
                   <div className="text-xs font-medium text-white">{user.username}</div>
                   <div className="text-xs text-gray-500 truncate">{user.email}</div>
                 </div>
+                <a
+                  href="/settings"
+                  className="block px-3 py-2 text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  ⚙ Settings
+                </a>
                 <button
                   onClick={logout}
                   className="w-full text-left px-3 py-2 text-xs text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-colors rounded-b-xl"
