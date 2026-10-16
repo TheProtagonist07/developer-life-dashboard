@@ -1,4 +1,3 @@
-/* global window, document */
 const devlife = window.devlife;
 
 const $ = (id) => document.getElementById(id);
