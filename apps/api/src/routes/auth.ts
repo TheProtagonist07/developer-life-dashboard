@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import { Strategy as GitHubStrategy } from "passport-github2";
+import { Strategy as GitHubStrategy, type Profile } from "passport-github2";
 import { config } from "../config";
 import { pool, queryOne } from "../db";
 import { issueToken, requireAuth, loadUser } from "../middleware/auth";
@@ -17,10 +17,15 @@ passport.use(
       callbackURL: config.github.callbackUrl,
       scope: ["user:email", "read:user"],
     },
-    async (_accessToken, _refreshToken, profile, done) => {
+    async (
+      _accessToken: string,
+      _refreshToken: string,
+      profile: Profile,
+      done: (err: unknown, user?: Express.User | false) => void
+    ) => {
       try {
         const email =
-          profile.emails?.find((e: { primary: boolean }) => e.primary)?.value ??
+          profile.emails?.find((e: { value: string; primary?: boolean }) => e.primary)?.value ??
           profile.emails?.[0]?.value ??
           null;
 
